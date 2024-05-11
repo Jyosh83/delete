@@ -1,0 +1,3633 @@
+===========================Assignment 1=========================================
+Beginning with an empty binary tree, construct binary tree by inserting the values in the
+order given. After constructing a binary tree perform following operations on it-
+1.Perform Inorder,Preorder and PostOrder Traversal.
+2.Change a tree so that the roles of the left and right pointers are swapped 
+at every node(Mirror Image of a tree).
+3.Find the height of tree.
+4.Copy this tree to another.[operator=]
+5.Count Number of Leave Nodes.(Also display them)
+6.Count Number of Internal Nodes.(Also display them)
+7.Erase all nodes in a binary tree.
+8.Level wise printing.
+(Implement Non Recursive of Preorder,Inorder,PostOrder,height).
+================================================================================
+Code: It will satisfy Practical No 1 and Q No (1,2,3,4) of Practical Question Bank.
+================================================================================
+#include <iostream>
+#include <queue>
+#include <stack>
+using namespace std;
+
+class treenode
+{
+private:
+    int data;
+    treenode *lchild;
+    treenode *rchild;
+
+public:
+    treenode()
+    {
+        data = 0;
+        lchild = NULL;
+        rchild = NULL;
+    }
+
+    treenode(int data)
+    {
+        this->data = data;
+        lchild = NULL;
+        rchild = NULL;
+    }
+    friend class tree;
+};
+
+class tree
+{
+private:
+    treenode *root;
+
+public:
+    tree()
+    {
+        root = NULL;
+    }
+
+    treenode *getRoot()
+    {
+        return root;
+    }
+
+    treenode *createNode(int data)
+    {
+        treenode *temp = new treenode(data);
+        return temp;
+    }
+
+    void create()
+    {
+        root = createTree();
+    }
+
+    treenode *createTree()
+    {
+        treenode *temp;
+        int data;
+        char ch;
+
+        cout << "Enter Data? " << endl;
+        cin >> data;
+
+        temp = createNode(data);
+
+        cout << "Do you want to enter right child(y/n) of " << temp->data << "?" << endl;
+        cin >> ch;
+
+        if (ch == 'y')
+            temp->rchild = createTree();
+
+        cout << "Do you want to enter left child(y/n) of " << temp->data << "?" << endl;
+        cin >> ch;
+
+        if (ch == 'y')
+            temp->lchild = createTree();
+
+        return temp;
+    }
+
+    void preorder(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        cout << node->data << " ";
+        preorder(node->lchild);
+        preorder(node->rchild);
+    }
+
+    void preorder1(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        stack<treenode *> s;
+        s.push(node);
+
+        while (!s.empty())
+        {
+            treenode *curr = s.top();
+            s.pop();
+            cout << curr->data << " ";
+
+            if (curr->rchild != NULL)
+                s.push(curr->rchild);
+            if (curr->lchild != NULL)
+                s.push(curr->lchild);
+        }
+    }
+
+    void inorder(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        inorder(node->lchild);
+        cout << node->data << " ";
+        inorder(node->rchild);
+    }
+
+    void inorder1(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        stack<treenode *> s;
+        treenode *curr = root;
+
+        while (curr != NULL || !s.empty())
+        {
+            while (curr != NULL)
+            {
+                s.push(curr);
+                curr = curr->lchild;
+            }
+
+            curr = s.top();
+            s.pop();
+            cout << curr->data << " ";
+            curr = curr->rchild;
+        }
+    }
+
+    void postorder(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        postorder(node->lchild);
+        postorder(node->rchild);
+        cout << node->data << " ";
+    }
+
+    void postorder1(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        stack<treenode *> s;
+        stack<treenode *> s1;
+        s.push(node);
+
+        while (!s.empty())
+        {
+            treenode *curr = s.top();
+            s.pop();
+            s1.push(curr);
+
+            if (curr->lchild != NULL)
+                s.push(curr->lchild);
+            if (curr->rchild != NULL)
+                s.push(curr->rchild);
+        }
+
+        while (!s1.empty())
+        {
+            treenode *curr = s1.top();
+            s1.pop();
+            cout << curr->data << " ";
+        }
+    }
+
+    void mirrorImage(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        mirrorImage(node->lchild);
+        mirrorImage(node->rchild);
+
+        treenode *temp = node->lchild;
+        node->lchild = node->rchild;
+        node->rchild = temp;
+    }
+
+    int height(treenode *node)
+    {
+        if (node == NULL)
+        {
+            return 0;
+        }
+        else
+        {
+            return (1 + (max(height(node->lchild), height(node->rchild))));
+        }
+    }
+
+    int height1(treenode *node)
+    {
+        if (node == NULL)
+            return 0;
+        int height = 0;
+        queue<treenode *> q;
+        q.push(node);
+
+        while (!q.empty())
+        {
+            int nodecount = q.size();
+
+            while (nodecount > 0)
+            {
+                treenode *curr = q.front();
+                q.pop();
+                if (curr->lchild != NULL)
+                    q.push(curr->lchild);
+                if (curr->rchild != NULL)
+                    q.push(curr->rchild);
+                nodecount--;
+            }
+
+            height = height + 1;
+        }
+        return height;
+    }
+
+    treenode *copy(treenode *node)
+    {
+        if (node == NULL)
+            return node;
+
+        treenode *temp = createNode(node->data);
+        temp->lchild = copy(node->lchild);
+        temp->rchild = copy(node->rchild);
+        return temp;
+    }
+
+    treenode *operator=(treenode *node)
+    {
+        return (copy(node));
+    }
+
+    int leaf(treenode *node)
+    {
+        if (node == NULL)
+            return 0;
+
+        if (node->lchild == NULL && node->rchild == NULL)
+        {
+            cout << node->data << endl;
+            return 1;
+        }
+        else
+            return leaf(node->lchild) + leaf(node->rchild);
+    }
+
+    int nonleaf(treenode *node)
+    {
+        if ((node == NULL) || (node->lchild == NULL && node->rchild == NULL))
+        {
+            return 0;
+        }
+        else
+        {
+            int count = 0;
+            if (node != root)
+            {
+                cout << node->data << endl;
+                count = 1;
+            }
+            count += nonleaf(node->lchild) + nonleaf(node->rchild);
+            return count;
+        }
+    }
+
+    void deleteTree(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        deleteTree(node->lchild);
+        deleteTree(node->rchild);
+        cout << "Node deleted with value " << node->data << endl;
+        delete node;
+    }
+
+    void levelOrderTraversal(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        queue<treenode *> q;
+        q.push(node);
+
+        while (!q.empty())
+        {
+            treenode *curr = q.front();
+            q.pop();
+            cout << curr->data << " ";
+            if (curr->lchild != NULL)
+                q.push(curr->lchild);
+            if (curr->rchild != NULL)
+                q.push(curr->rchild);
+        }
+    }
+};
+
+int main()
+{
+    int ch;
+    int ch1;
+    int flag = 0;
+    tree obj;
+    treenode *o1, *o2;
+
+    do
+    {
+
+        cout << "------------Enter your choice---------------" << endl;
+        cout << "1-Creating Binary Tree " << endl;
+        cout << "2-Preorder traversal " << endl;
+        cout << "3-Inorder traversal " << endl;
+        cout << "4-Postorder traversal " << endl;
+        cout << "5-Mirror Image of a Tree " << endl;
+        cout << "6-Height of Tree " << endl;
+        cout << "7-Copy of Tree " << endl;
+        cout << "8-Count and Display Leaf Nodes " << endl;
+        cout << "9-Count and Display Internal Nodes " << endl;
+        cout << "10-Erase all nodes in a binary tree " << endl;
+        cout << "11-Level wise printing " << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            obj.create();
+            flag = 1;
+            break;
+
+        case 2:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                cout << "Prorder Travsersal with recursion " << endl;
+                obj.preorder(obj.getRoot());
+                cout << endl;
+                cout << "Prorder Travsersal without recursion " << endl;
+                obj.preorder1(obj.getRoot());
+                cout << endl;
+            }
+            break;
+        case 3:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                cout << "Inorder Travsersal with recursion " << endl;
+                obj.inorder(obj.getRoot());
+                cout << endl;
+                cout << "Inorder Travsersal without recursion " << endl;
+                obj.inorder1(obj.getRoot());
+                cout << endl;
+            }
+            break;
+        case 4:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                cout << "Postorder Travsersal with recursion " << endl;
+                obj.postorder(obj.getRoot());
+                cout << endl;
+                cout << "Postorder Travsersal without recursion " << endl;
+                obj.postorder1(obj.getRoot());
+                cout << endl;
+            }
+            break;
+
+        case 5:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                cout << "Inorder traversal of tree before mirror image: " << endl;
+                obj.inorder(obj.getRoot());
+                obj.mirrorImage(obj.getRoot());
+                cout << endl;
+                cout << "Inorder traversal of tree after mirror image: " << endl;
+                obj.inorder(obj.getRoot());
+                cout << endl;
+            }
+            break;
+
+        case 6:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                cout << "With Recursion " << endl;
+                cout << "The Height of Tree is " << obj.height(obj.getRoot()) << endl;
+                cout << "With Recursion " << endl;
+                cout << "The Height of Tree is " << obj.height1(obj.getRoot()) << endl;
+                cout << endl;
+            }
+            break;
+
+        case 7:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                obj.mirrorImage(obj.getRoot()); // So that our tree swaps again as we have swapped once
+                o1 = obj.getRoot();
+                o2 = o1;
+                cout << "Tree Copied Successfully!! " << endl;
+                cout << "Inorder Traversal of Copied Tree " << endl;
+                obj.inorder(o2);
+                cout << endl;
+            }
+            break;
+
+        case 8:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                cout << "The leaf Nodes are : " << endl;
+                cout << "The total count of leaf is " << obj.leaf(obj.getRoot());
+                cout << endl;
+            }
+            break;
+
+        case 9:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                cout << "The Internal Nodes are : " << endl;
+                cout << "The total count of Internal Nodes are " << obj.nonleaf(obj.getRoot());
+                cout << endl;
+            }
+            break;
+
+        case 10:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                cout << "Deleting Tree... " << endl;
+                obj.deleteTree(obj.getRoot());
+                cout << endl;
+            }
+            break;
+
+        case 11:
+            if (flag == 0)
+            {
+                cout << "Create Tree First !!" << endl;
+            }
+            else
+            {
+                cout << "Level Order Printing.. : " << endl;
+                obj.levelOrderTraversal(obj.getRoot());
+                cout << endl;
+            }
+            break;
+
+        default:
+            cout << "Enter a Valid Choice " << endl;
+            break;
+        }
+
+        cout << "Do you want to continue,Press 1" << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+
+    return 0;
+}
+===========================Assignment 2=========================================
+Beginning with an empty binary search tree. Construct the binary search tree by inserting
+the values in given order. After constructing binary search tree perform following
+operations:
+1-Insert Node in BST 
+2-Number of Nodes in the longest path 
+3-Minimum and Maximum data valee found in tree 
+4-Change a tree so that the roles of left and right pointers are swapped 
+5-Search an element and also find no of comparisons to search that element 
+6-Level Order Traversal 
+7-Data Sorted in Ascending order using non recursive traversal 
+8-Data Sorted in Descending order using non recursive traversal
+9-Delete element from a BST
+================================================================================
+Code: It will satisfy Practical No 2 and Q No (5,6,7,9) of Practical Question Bank.
+================================================================================
+#include <iostream>
+#include <climits>
+#include <queue>
+#include <stack>
+using namespace std;
+
+class treenode
+{
+private:
+    int data;
+    treenode *lchild;
+    treenode *rchild;
+
+public:
+    treenode()
+    {
+        data = 0;
+        lchild = NULL;
+        rchild = NULL;
+    }
+    treenode(int data)
+    {
+        this->data = data;
+        lchild = NULL;
+        rchild = NULL;
+    }
+    friend class tree;
+};
+
+class tree
+{
+private:
+    treenode *root;
+
+public:
+    tree()
+    {
+        root = NULL;
+    }
+
+    treenode *&getRoot()
+    {
+        return root;
+    }
+
+    treenode *getRoot1()
+    {
+        return root;
+    }
+
+    void insertBST(treenode *&root, int data)
+    {
+        if (root == NULL)
+        {
+            root = new treenode(data);
+            return;
+        }
+
+        // go to left
+        if (data < root->data)
+        {
+            if (root->lchild == NULL)
+            {
+                treenode *temp = new treenode(data);
+                root->lchild = temp;
+            }
+            else
+            {
+                insertBST(root->lchild, data);
+            }
+        }
+        else // otherwise goto right
+        {
+
+            if (root->rchild == NULL)
+            {
+                treenode *temp = new treenode(data);
+                root->rchild = temp;
+            }
+            else
+            {
+                insertBST(root->rchild, data);
+            }
+        }
+    }
+
+    void preorder(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        cout << node->data << " ";
+        preorder(node->lchild);
+        preorder(node->rchild);
+    }
+
+    int height(treenode *node)
+    {
+        if (node == NULL)
+        {
+            return 0;
+        }
+        else
+        {
+            return 1 + (max(height(node->lchild), height(node->rchild)));
+        }
+    }
+
+    void minMax(treenode *node, int &mini, int &maxi)
+    {
+        if (node == NULL)
+            return;
+
+        minMax(node->lchild, mini, maxi);
+        mini = min(mini, node->data);
+        maxi = max(maxi, node->data);
+        minMax(node->rchild, mini, maxi);
+    }
+    void minimumAndMaximum(treenode *node)
+    {
+        int mini = INT_MAX;
+        int maxi = INT_MIN;
+        minMax(node, mini, maxi);
+        cout << "The minimum value is " << mini << " and the maximum value is " << maxi << endl;
+    }
+
+    void swapTree(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        swapTree(node->lchild);
+        swapTree(node->rchild);
+
+        treenode *temp = node->lchild;
+        node->lchild = node->rchild;
+        node->rchild = temp;
+    }
+
+    void search(treenode *node, int data, int &noc)
+    {
+        if (node == NULL)
+        {
+            cout << data << " not found in Binary Search Tree " << endl;
+            noc = -1;
+        }
+        else if (data == node->data)
+        {
+            noc++;
+            cout << data << " found in Binary Search Tree " << endl;
+        }
+        else if (data < node->data)
+        {
+            noc++;
+            search(node->lchild, data, noc);
+        }
+        else if (data > node->data)
+        {
+            noc++;
+            search(node->rchild, data, noc);
+        }
+    }
+
+    void searchElement()
+    {
+        int data;
+        cout << "Enter the data you want to search " << endl;
+        cin >> data;
+        int noc = 0;
+        search(root, data, noc);
+        cout << "No of Comparisons required to search " << noc << endl;
+    }
+
+    void levelOrderTraversal(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        queue<treenode *> q;
+        q.push(node);
+
+        while (!q.empty())
+        {
+            treenode *temp = q.front();
+            q.pop();
+            cout << temp->data << " ";
+
+            if (temp->lchild != NULL)
+                q.push(temp->lchild);
+            if (temp->rchild != NULL)
+                q.push(temp->rchild);
+        }
+        cout << endl;
+    }
+
+    void inorder(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        stack<treenode *> s;
+        treenode *current = node;
+
+        while (current != NULL || !s.empty())
+        {
+            while (current != NULL)
+            {
+                s.push(current);
+                current = current->lchild;
+            }
+
+            current = s.top();
+            s.pop();
+            cout << current->data << " ";
+            current = current->rchild;
+        }
+        cout << endl;
+    }
+
+    void decinorder(treenode *node)
+    {
+        if (node == NULL)
+            return;
+        stack<treenode *> s;
+        treenode *current = node;
+
+        while (current != NULL || !s.empty())
+        {
+            while (current != NULL)
+            {
+                s.push(current);
+                current = current->rchild;
+            }
+
+            current = s.top();
+            s.pop();
+            cout << current->data << " ";
+            current = current->lchild;
+        }
+        cout << endl;
+    }
+
+    void find(treenode *node,int data,treenode *&parent,treenode *&current)
+    {
+        if(node == NULL) return;
+        if(node->lchild && node->lchild->data == data || node->rchild && node->rchild->data == data) parent = node;
+        if(node->data == data) current = node;
+        find(node->lchild,data,parent,current);
+        find(node->rchild,data,parent,current);
+    }
+
+    void delBST(treenode *&parent,treenode *&child)
+    {
+        if(child->lchild != NULL && child->rchild != NULL)
+        {
+            parent = child;
+            treenode *child_succ = parent->rchild;
+            while (child_succ->lchild != NULL)
+            {
+                parent = child_succ;
+                child_succ = child_succ->lchild;
+            }
+            child->data = child_succ->data;
+            child = child_succ;
+
+        }
+        if(child->lchild == NULL && child->rchild == NULL)
+        {
+            if(parent->lchild == child)
+            {
+                parent->lchild = NULL;
+            }
+            else
+            {
+                parent->rchild = NULL;
+            }
+            delete child;
+            return;
+
+        }
+        if(child->lchild != NULL && child->rchild == NULL)
+        {
+            if(parent->lchild == child)
+            {
+                parent->lchild = child->lchild;
+            }
+            else
+            {
+                parent->rchild = child->lchild;
+            }
+            delete child;
+            return;
+        }
+        if(child->lchild == NULL && child->rchild != NULL)
+        {
+            if(parent->lchild == child)
+            {
+                parent->lchild = child->rchild;
+            }
+            else
+            {
+                parent->rchild = child->rchild;
+            }
+            delete child;
+            return;        
+            
+        }
+        
+    }
+
+    
+};
+
+int main()
+{
+    tree obj;
+    int ch, ch1;
+    int flag = 0;
+    int data;
+    treenode *parent,*current;
+    int c = 0;
+
+    do
+    {
+        cout << "-------------Enter your choice-------------------" << endl;
+        cout << "1-Insert Node in BST " << endl;
+        cout << "2-Number of Nodes in the longest path " << endl;
+        cout << "3-Minimum and Maximum data valee found in tree " << endl;
+        cout << "4-Change a tree so that the roles of left and right pointers are swapped " << endl;
+        cout << "5-Search an element and also find no of comparisons to search that element " << endl;
+        cout << "6-Level Order Traversal " << endl;
+        cout << "7-Data Sorted in Ascending order using non recursive traversal " << endl;
+        cout << "8-Data Sorted in Descending order using non recursive traversal " << endl;
+        cout << "9-Delete element from a BST" << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter the data you want to insert !! " << endl;
+            cin >> data;
+            obj.insertBST(obj.getRoot(), data);
+            flag = 1;
+            break;
+
+        case 2:
+            if (flag == 0)
+            {
+                cout << "Enter Data First !! " << endl;
+                break;
+            }
+            else
+            {
+                cout << "The Height of Tree is " << obj.height(obj.getRoot1());
+                cout << endl;
+            }
+            break;
+
+        case 3:
+            if (flag == 0)
+            {
+                cout << "Enter Data First !! " << endl;
+                break;
+            }
+            else
+            {
+                obj.minimumAndMaximum(obj.getRoot1());
+            }
+            break;
+
+        case 4:
+            if (flag == 0)
+            {
+                cout << "Enter Data First !! " << endl;
+                break;
+            }
+            else
+            {
+                cout << "Printing Contents before swap"
+                     << " ";
+                obj.inorder(obj.getRoot1());
+                obj.swapTree(obj.getRoot1());
+                cout << "Printing Contents after swap "
+                     << " ";
+                obj.inorder(obj.getRoot1());
+            }
+            break;
+
+        case 5:
+            if (flag == 0)
+            {
+                cout << "Enter Data First !! " << endl;
+                break;
+            }
+            else
+            {
+                obj.searchElement();
+            }
+            break;
+
+        case 6:
+            if (flag == 0)
+            {
+                cout << "Enter Data First !! " << endl;
+                break;
+            }
+            else
+            {
+                obj.levelOrderTraversal(obj.getRoot1());
+            }
+            break;
+
+        case 7:
+            if (flag == 0)
+            {
+                cout << "Enter Data First !! " << endl;
+                break;
+            }
+            else
+            {
+                obj.inorder(obj.getRoot1());
+            }
+            break;
+
+        case 8:
+
+            if (flag == 0)
+            {
+                cout << "Enter Data First !! " << endl;
+                break;
+            }
+            else
+            {
+                obj.decinorder(obj.getRoot1());
+            }
+            break;
+
+        case 9:
+            if (flag == 0)
+            {
+                cout << "Enter Data First !! " << endl;
+                break;
+            }
+            else
+            {
+                parent = NULL;
+                current = obj.getRoot1();
+                cout << "Enter the data you want to delete " << endl;
+                cin >> data;
+                obj.find(obj.getRoot(),data,parent,current);
+                obj.search(obj.getRoot(),data,c);
+                if(c == -1)
+                {
+                    break;
+                }
+                else
+                {
+                    obj.delBST(parent,current);
+                    cout << data << " deleted successfully !! " << endl;
+                }
+                
+            }          
+            break;
+
+        default:
+            cout << "Enter a valid choice " << endl;
+            break;
+        }
+
+        cout << "Do you want to continue,Press 1 " << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+
+    return 0;
+}
+===========================Assignment 3=========================================
+Create an inordered threaded binary search tree for integer value. Perform inorder and
+preorder traversals and also deleteion of a node.During Inorder also find largest and 
+smallest value in TBST.
+Note: Display lbit, rbit for every node
+================================================================================
+Code: It will satisfy Practical No 3 and Q No (8,10,11,12) of Practical Question Bank.
+================================================================================
+#include <iostream>
+using namespace std;
+
+class Node
+{
+private:
+    int data;
+    Node *left;
+    Node *right;
+    bool lbit;
+    bool rbit;
+
+public:
+    Node()
+    {
+        data = 0;
+        left = NULL;
+        right = NULL;
+        lbit = false;
+        rbit = false;
+    }
+    Node(int data)
+    {
+        this->data = data;
+        left = NULL;
+        right = NULL;
+        lbit = false;
+        rbit = false;
+    }
+    friend class TBST;
+};
+
+class TBST
+{
+private:
+    Node *root, *head;
+
+public:
+    TBST()
+    {
+        root = NULL;
+        head = NULL;
+    }
+
+    Node *getRoot()
+    {
+        return root;
+    }
+
+    void insert(int key)
+    {
+        // If our head is NULL
+        if (head == NULL)
+        {
+            head = new Node(-9999); // enter some random value
+            head->right = head;     // self link
+            root = new Node(key);
+            head->left = root;
+            head->lbit = true;
+            root->right = head;
+            root->left = head;
+        }
+        else
+        {
+            Node *parent = root;
+            Node *new_node = new Node(key);
+            // We already have some nodes in TBST
+
+            while (true)
+            {
+                if (parent->data == key)
+                {
+                    delete new_node; // This indicates that the data entry is duplicate
+                    return;
+                }
+                else if (key < parent->data)
+                {
+                    if (parent->lbit == true) // When we have parent as root and no other child and we need to find a node with both bool fields 0 and 0
+                    {
+                        parent = parent->left;
+                    }
+                    else
+                    {
+                        new_node->left = parent->left;
+                        new_node->right = parent;
+                        parent->left = new_node;
+                        parent->lbit = true;
+                        return;
+                    }
+                }
+                else // key > parent->data
+                {
+                    if (parent->rbit == true) // When we have parent as root and no other child and we need to find a node with both bool fields 0 and 0
+                    {
+                        parent = parent->right;
+                    }
+                    else
+                    {
+                        new_node->right = parent->right;
+                        new_node->left = parent;
+                        parent->right = new_node;
+                        parent->rbit = true;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    void inorder(Node *root)
+    {
+        Node *temp = root;
+        Node *largest = NULL;
+        Node *smallest = NULL;
+
+        while (temp->lbit == true)
+        {
+            temp = temp->left;
+        }
+        smallest = temp;
+
+        temp = root;
+        while (temp->rbit == true)
+        {
+            temp = temp->right;
+        }
+        largest = temp;
+
+        // Now make temp point to again the smallest element
+        temp = smallest;
+        while (temp != head)
+        {
+            cout << temp->data << " " << temp->lbit << " " << temp->rbit << endl;
+            if (temp->rbit == true)
+            {
+                temp = temp->right;
+                while (temp->lbit == true)
+                {
+                    temp = temp->left;
+                }
+            }
+            else
+            {
+                temp = temp->right; // agar temp ka rbit false hein matlab uska koi bhi child nahi hein directly go to next node
+            }
+        }
+
+        cout << "The Smallest element is " << smallest->data << " and the largest element is " << largest->data << endl;
+    }
+
+    void postorder(Node *root)
+    {
+        Node *temp = root;
+        int flag = 0;
+        while (temp != head)
+        {
+            if (flag == 0)
+            {
+                cout << temp->data << " " << temp->lbit << " " << temp->rbit << endl;
+            }
+
+            if (flag == 0 && temp->lbit == 1)
+            {
+                temp = temp->left;
+            }
+            else
+            {
+                flag = (temp->rbit == true) ? (0) : (1);
+                temp = temp->right;
+            }
+        }
+    }
+
+    bool search(int data, Node *&root, Node *&parent)
+    {
+        while (root != head)
+        {
+            if (root->data == data)
+                return true;
+            else
+            {
+                parent = root;
+                if (data > root->data)
+                {
+                    root = root->right;
+                }
+                else
+                {
+                    root = root->left;
+                }
+            }
+        }
+        return false;
+    }
+
+    void remove(Node *&parent, Node *&current)
+    {
+        if (current->lbit == true && current->rbit == true) // The node we want to delete has 2 childs
+        {
+            // Now lets find his inorder successor
+            Node *cs = current->right;
+            parent = current; // bring parent where there is current
+            while (cs->lbit == true)
+            {
+                parent = cs;
+                cs = cs->left;
+            }
+            current->data = cs->data;
+            current = cs;
+            cout << "Deleting node with 2 links " << endl;
+        }
+
+        if (current->lbit == false && current->rbit == false)
+        {
+            if (parent->left == current)
+            {
+                cout << "Deleting Leaf(Left) " << endl;
+                parent->left = current->left;
+                parent->lbit = false;
+            }
+            else
+            {
+                cout << "Deleting Leaf(Right) " << endl;
+                parent->right = current->right;
+                parent->rbit = false;
+            }
+            delete current;
+        }
+
+        if (current->lbit == false && current->rbit == true)
+        {
+            Node *temp = current->right;
+            if (parent->left == current)
+            {
+                parent->left = temp;
+            }
+            else
+            {
+                parent->right = temp;
+            }
+
+            while (temp->lbit == true)
+            {
+                temp = temp->left;
+            }
+            temp->left = current->left;
+            cout << "Deleting Node with right link " << endl;
+        }
+
+        if (current->lbit == true && current->rbit == false)
+        {
+            Node *temp = current->left;
+            if (parent->left == current)
+            {
+                parent->left = temp;
+            }
+            else
+            {
+                parent->right = temp;
+            }
+
+            while (temp->rbit == true)
+            {
+                temp = temp->right;
+            }
+            temp->right = current->right;
+            cout << "Deleting Node with left link " << endl;
+        }
+    }
+};
+
+int main()
+{
+    TBST obj;
+    int ch;
+    int ch1;
+    int count;
+    int temp;
+    Node *parent, *root;
+
+    do
+    {
+        cout << "================================================" << endl;
+        cout << "==========Enter your choice=====================" << endl;
+        cout << "1-Insert Node in a TBST" << endl;
+        cout << "2-Inorder Traversal of a TBST(also Finding Smallest and Largest element of tree and displaying lbit and rbit)" << endl;
+        cout << "3-Preorder Traversal of a TBST " << endl;
+        cout << "4-Deletion of a node in TBST " << endl;
+        cout << "5-Exit" << endl;
+        cout << "================================================" << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter the number of nodes you want to insert " << endl;
+            cin >> count;
+            while (count > 0)
+            {
+                cout << "Enter Data : "
+                     << " ";
+                cin >> temp;
+                obj.insert(temp);
+                count--;
+            }
+            cout << "Nodes Inserted !! " << endl;
+            break;
+
+        case 2:
+            cout << "Inorder Traversal is " << endl;
+            obj.inorder(obj.getRoot());
+            break;
+
+        case 3:
+            cout << "Postorder Traversal is " << endl;
+            obj.postorder(obj.getRoot());
+            break;
+
+        case 4:
+            cout << "Enter data to delete " << endl;
+            cin >> temp;
+            root = obj.getRoot(); // this root points to the current node to delete
+            parent = NULL;        // first task is to find parent
+
+            if (obj.search(temp, root, parent))
+            {
+                obj.remove(parent, root);
+                cout << temp << " deleted !! " << endl;
+            }
+            else
+            {
+                cout << temp << " not found !! " << endl;
+            }
+
+            break;
+
+        case 5:
+            cout << "Program exited !! " << endl;
+            exit(0);
+            break;
+        default:
+            cout << "Enter a valid Choice..." << endl;
+            break;
+        }
+
+        cout << "Do you want to continue,Press 1 " << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+
+    return 0;
+}
+================================================================================
+===========================Assignment 4=========================================
+Consider telephone book database of N clients. Make use of a hash table implementation
+to quickly look up client‘s telephone number. Make use of two collision handling
+techniques and compare them using number of comparisons required to find a set of
+telephone numbers (Note: Use linear probing with replacement and without replacement).
+Perform following operations
+1. Insert
+2. Delete
+3. Search
+4. Display
+Use Hash function as H(x) = (3*x + 5)%10
+================================================================================
+Code: It will satisfy Practical No 4 and Q No (14,16) of Practical Question Bank.
+================================================================================
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Hashing
+{
+private:
+    int max = 10;
+
+public:
+    void with(vector<long long> &arr1, long long key)
+    {
+        int hashIdx = int((3 * key + 5) % 10);
+        bool flag = false;
+
+        while (flag == false)
+        {
+            if (arr1[hashIdx] == -1)
+            {
+                arr1[hashIdx] = key;
+                flag = true;
+                break;
+            }
+            else
+            {
+                long long temp = arr1[hashIdx];
+                // Storing the hashed index element in temp
+                if ((3 * temp + 5) % 10 == hashIdx)
+                {
+                    // temp apne sahi jagah pein hein, key ki liye value dhoondo
+                    int next = (hashIdx + 1) % 10;
+                    while (arr1[next] != -1)
+                    {
+                        next++;
+                        if (next >= 10)
+                            next = next % 10;
+                    }
+                    arr1[next] = key;
+                    flag = true;
+                    break;
+                }
+                else
+                {
+                    // temp key ke jagah par tha,key ko apne jagah dal diya
+                    arr1[hashIdx] = key;
+                    int next = (hashIdx + 1) % 10;
+                    while (arr1[next] != -1)
+                    {
+                        next++;
+                        if (next >= 10)
+                            next = next % 10;
+                    }
+                    arr1[next] = temp;
+                    flag = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    void without(vector<long long> &arr2, long long key)
+    {
+        int hashIdx = int((3 * key + 5) % 10);
+        bool flag = false;
+
+        while (flag == false)
+        {
+            if (arr2[hashIdx] == -1)
+            {
+                arr2[hashIdx] = key;
+                flag = true;
+                break;
+            }
+            else
+            {
+                // Lets find now next positions
+                int next = (hashIdx + 1) % 10;
+                while (arr2[next] != -1)
+                {
+                    next++;
+                    if (next >= 10)
+                        next = next % 10;
+                }
+                arr2[next] = key;
+                flag = true;
+                break;
+            }
+        }
+    }
+
+    bool findwith(vector<long long> &arr1, long long key)
+    {
+        bool flag = false;
+        for (int i = 0; i < max; i++)
+        {
+            if (arr1[i] == key)
+            {
+                flag = true;
+                return flag;
+            }
+        }
+        return flag;
+    }
+
+    bool findwithout(vector<long long> &arr2, long long key)
+    {
+        bool flag = false;
+        for (int i = 0; i < max; i++)
+        {
+            if (arr2[i] == key)
+            {
+                flag = true;
+                return flag;
+            }
+        }
+        return flag;
+    }
+
+    void delwith(vector<long long> &arr1, long long key)
+    {
+        int hashIdx = int((3 * key + 5) % 10);
+        if (arr1[hashIdx] == key)
+        {
+            arr1[hashIdx] = -1;
+        }
+        else
+        {
+            int next = (hashIdx + 1) % 10;
+            int cnt = 0;
+
+            while (cnt <= 10)
+            {
+                if (arr1[next] == key)
+                {
+                    arr1[next] = -1;
+                    break;
+                }
+                next = (next + 1) % 10;
+                cnt++;
+            }
+        }
+    }
+
+    void delwithout(vector<long long> &arr2, long long key)
+    {
+        int hashIdx = int((3 * key + 5) % 10);
+        if (arr2[hashIdx] == key)
+        {
+            arr2[hashIdx] = -1;
+        }
+        else
+        {
+            int next = (hashIdx + 1) % 10;
+            int cnt = 0;
+
+            while (cnt <= 10)
+            {
+                if (arr2[next] == key)
+                {
+                    arr2[next] = -1;
+                    break;
+                }
+                next = (next + 1) % 10;
+                cnt++;
+            }
+        }
+    }
+
+    int searchwith(vector<long long> &arr1, long long key)
+    {
+        int hashIdx = int((3 * key + 5) % 10);
+        int c1 = 0;
+        c1++;
+        if (arr1[hashIdx] == key)
+        {
+            return c1;
+        }
+        else
+        {
+            int next = (hashIdx + 1) % 10;
+            int cnt = 0;
+            bool flag = false;
+
+            while (cnt <= 10)
+            {
+                c1++;
+                if (arr1[next] == key)
+                {
+                    flag = true;
+                    break;
+                }
+                next = (next + 1) % 10;
+                cnt++;
+            }
+
+            return c1;
+        }
+    }
+
+    int searchwithout(vector<long long> &arr2, long long key)
+    {
+        int hashIdx = int((3 * key + 5) % 10);
+        int c2 = 0;
+        c2++;
+        if (arr2[hashIdx] == key)
+        {
+            return c2;
+        }
+        else
+        {
+            int next = (hashIdx + 1) % 10;
+            int cnt = 0;
+            bool flag = false;
+            while (cnt <= 10)
+            {
+                c2++;
+                if (arr2[next] == key)
+                {
+                    flag = true;
+                    break;
+                }
+                next = (next + 1) % 10;
+                cnt++;
+            }
+
+            return c2;
+        }
+    }
+
+    void display(vector<long long> &arr1, vector<long long> &arr2)
+    {
+        cout << "With Replacement : " << endl;
+        for (int i = 0; i < 10; i++)
+        {
+            cout << i << " : " << arr1[i] << endl;
+        }
+
+        cout << "\nWithout Replacement : " << endl;
+        for (int i = 0; i < 10; i++)
+        {
+            cout << i << " : " << arr2[i] << endl;
+        }
+    }
+};
+
+int main()
+{
+    int ch, ch1;
+    int count = 0;
+    Hashing obj;
+    vector<long long> arr1(10, -1);
+    vector<long long> arr2(10, -1);
+    long long data;
+    int a,b;
+
+    do
+    {
+        cout << "-----------Enter your choice--------------" << endl;
+        cout << "1.Insert" << endl;
+        cout << "2.Delete" << endl;
+        cout << "3.Search" << endl;
+        cout << "4.Display" << endl;
+        cout << "-------------------------------------------" << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            if (count < 10)
+            {
+                cout << "Enter the number you want to insert " << endl;
+                cin >> data;
+                obj.with(arr1, data);
+                obj.without(arr2, data);
+                count++;
+                cout << "Number Inserted Successfully.." << endl;
+            }
+            else
+            {
+                cout << "Hash Table is Full " << endl;
+            }
+
+            break;
+
+        case 2:
+            cout << "Enter the number you want to delete " << endl;
+            cin >> data;
+            if (obj.findwith(arr1,data) && obj.findwithout(arr2,data))
+            {
+                obj.delwith(arr1, data);
+                obj.delwithout(arr2, data);
+                count--;
+                cout << "Number Deleted Successfully.." << endl;
+
+            }
+            else
+            {
+                cout << "Value doesn't exist in Hash Table" << endl;
+            }
+            break;
+        
+        case 3:
+            cout << "Enter the number you want to search " << endl;
+            cin >> data;
+            if (obj.findwith(arr1,data) && obj.findwithout(arr2,data))
+            {
+                a = obj.searchwith(arr1,data);
+                b = obj.searchwithout(arr2,data);
+                cout << "With Replacement : \nThe number of comparisons are : " << a << endl;
+                cout << "Without Replacement : \nThe number of comparisons are : " << b << endl;
+            }
+            else
+            {
+                cout << "Value doesn't exist in Hash Table" << endl;
+            }
+            break;
+
+        case 4: 
+            obj.display(arr1,arr2);
+            break; 
+
+        case 5: 
+            cout << "Exiting..." << endl;
+            exit(0);
+            break;
+
+        default:
+            cout << "Enter a valid choice " << endl;
+            break;
+        }
+
+        cout << "Do you want to continue,Press 1 " << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+
+    return 0;
+}
+======================Assignment No 5==================================================
+Implement all the functions of a dictionary (ADT) using open hashing technique:
+separate chaining using linked list Data: Set of (key, value) pairs, Keys are mapped to
+values, Keys must be comparable, and Keys must be unique. Standard Operations: Insert
+(key, value), Find(key), Delete(key), Display.
+Use hash function as H(x) = (3x+5) %10
+================================================================================
+Code: It will satisfy Practical No 5 and Q No (13,15) of Practical Question Bank.
+================================================================================
+#include<iostream>
+#include<utility>
+using namespace std;
+
+class Hashnode
+{
+private:
+    pair<string,string> data;
+    Hashnode* next;
+public:
+    Hashnode()
+    {
+        data.first = "";
+        data.second = "";
+        next = NULL;
+    }
+    Hashnode(string key,string val)
+    {
+        data.first = key;
+        data.second = val;
+        next = NULL;
+    }
+    friend class SLL;
+    friend class Dictionary;
+};
+
+class SLL
+{
+private:
+    Hashnode *head;
+public:
+    SLL()
+    {
+        head = NULL;
+    }
+
+    void Append(string key,string val)
+    {
+        Hashnode *new_node = new Hashnode(key,val);
+        if(head == NULL)
+        {
+            head = new_node;
+            return;
+        }
+        else
+        {
+            Hashnode* temp = head;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = new_node;
+        }
+    }
+
+    void Traversal()
+    {
+        Hashnode *temp = head;
+        while (temp != NULL)
+        {
+            cout << temp->data.first << " : " << temp->data.second << " -> ";
+            temp = temp->next;
+        }
+    }
+
+    int Search(string key)
+    {
+        Hashnode *temp = head;
+        bool flag = false;
+        while (temp != NULL)
+        {
+            if(temp->data.first == key)
+            {
+                flag = true;
+                return 1;
+            }
+            temp = temp->next;
+        }
+
+        if(flag == false) return 0;
+
+    }
+
+    void del(string key)
+    {
+        if (head == NULL)
+        {
+            cout << "Empty..." << endl;
+        }
+        else
+        {
+            Hashnode *temp = head;
+            if(temp->data.first == key || temp->next == NULL)
+            {
+                head = head->next;
+                return;
+            }
+            while(temp != NULL && temp->next->data.first != key)
+            {
+                temp = temp->next;
+            }
+            temp->next = temp->next->next;
+        } 
+    }
+    friend class Dictionary;
+};
+
+class Dictionary //Here we have to implement Insert,Find,Delete and Display
+{
+private:
+    SLL arr[26];
+public:
+    int hash(string key)
+    {
+        int ans = int(key[0]) - 97;
+        return ans;
+    }
+
+    void insert(string key,string val)
+    {
+        int hkey = hash(key);
+        arr[hkey].Append(key,val);
+        cout << "Key,value inserted in Dictionary!! " << endl;
+    }
+
+    void find(string key)
+    {
+        int hkey = hash(key);
+        int ans = arr[hkey].Search(key);
+        if(ans) cout << "Element Found in Dictionary " << endl;
+        else cout << "Element Not Found in Dictionary " << endl;
+    }
+
+    void remove(string key)
+    {
+        int hkey = hash(key);
+        int ans = arr[hkey].Search(key);
+        if(ans)
+        {
+            arr[hkey].del(key);
+            cout << "Element Deleted from Dictionary !! " << endl;
+        }
+        else cout << "Element Not Found in Dictionary " << endl;
+    }
+
+    void display()
+    {
+        for (int i = 0; i < 26; i++)
+        {
+            cout << char('a' + i) << " : ";
+            arr[i].Traversal();
+            cout << endl;
+        }
+
+    }
+};
+
+int main()
+{
+    int ch,ch1;
+    string key,val;
+    Dictionary obj;
+
+    do
+    {
+        cout << "---------------Enter your choice-------------------" << endl;
+        cout << "1-Insert in a Dictionary" << endl;
+        cout << "2-Search in a Dictionary" << endl;
+        cout << "3-Delete from a Dictionary" << endl;
+        cout << "4-Display from Dictionary" << endl;
+        cout << "5-Exit" << endl;
+        cout << "---------------------------------------------------" << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter word: " << endl;
+            cin >> key;
+            cout << "Enter meaning: " << endl;
+            cin >> val;
+            obj.insert(key,val);
+            break;
+        
+        case 2: 
+            cout << "Enter the word to Search: " << endl;
+            cin >> key;
+            obj.find(key);
+            break;
+
+        case 3:
+            cout << "Enter the word to delete: " << endl;
+            cin >> key;
+            obj.remove(key);
+            break;
+
+        case 4:
+            cout << "Displaying contents of Dictionary: " << endl;
+            obj.display();
+            break;
+
+        case 5: 
+            cout << "Quiting..." << endl;
+            exit(0);
+            break;
+        
+        default:
+            cout << "Enter a Valid Choice " << endl;
+            break;
+        }
+
+        cout << "Do you want to continue,Press 1 " << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+    
+    return 0;
+}
+
+------------------------------------
+For Hash Function: (3*x+5)mod10
+Change the contents of hash such as:
+int Hash(string str)
+{
+	int val = int(str[0]) - 97;
+	int val1 = (3 * val + 5) % 10;
+	return val;
+}
+
+===========================Assignment 6=========================================
+Write menu driven C++ program to
+1. Represent a given graph using adjacency list/Adjacency Matrix. Use the map of the
+area around the college as the graph
+2. Display Graph
+3. Perform DFS traversal using recursive/non-recursive algorithm(From given vertex).
+4. Perform BFS traversal.
+5. calculate degree of each node
+Note: Write your own Queue class 
+
+================================================================================
+Code: It will satisfy Practical No 6 and Q No (17,18,19) of Practical Question Bank.
+================================================================================
+
+#include <iostream>
+using namespace std;
+#define size 100
+
+template <class T>
+class Stack
+{
+private:
+    T arr[size];
+    int top;
+
+public:
+    Stack()
+    {
+        top = -1;
+    }
+    bool isFull()
+    {
+        return top > size - 1;
+    }
+    bool isEmpty()
+    {
+        return top == -1;
+    }
+    void push(int data)
+    {
+        if (isFull())
+        {
+            cout << "Stack is Full !! " << endl;
+            return;
+        }
+        arr[++top] = data;
+    }
+    T pop()
+    {
+        if (isEmpty())
+        {
+            cout << "Stack is Empty !! " << endl;
+            exit(0);
+        }
+        T temp = arr[top];
+        top--;
+        return temp;
+    }
+};
+
+template <class T>
+class Queue
+{
+private:
+    T arr[size];
+    int front;
+    int rear;
+
+public:
+    Queue()
+    {
+        front = -1;
+        rear = -1;
+    }
+    bool isFull()
+    {
+        if (rear > size - 1)
+            return true;
+        else
+            return false;
+    }
+    bool isEmpty()
+    {
+        if (front == -1 || front >= rear)
+            return true;
+        else
+            return false;
+    }
+    void enqueue(int data)
+    {
+        if (isFull())
+        {
+            cout << "Queue is Full!!" << endl;
+            return;
+        }
+        if (front == -1)
+        {
+            front = 0;
+            arr[front] = data;
+            rear = 1;
+            return;
+        }
+
+        arr[rear] = data;
+        rear = rear + 1;
+        return;
+    }
+    T dequeue()
+    {
+        if (isEmpty())
+        {
+            cout << "Queue is Empty " << endl;
+            exit(0);
+        }
+        T data = arr[front];
+        front += 1;
+        return data;
+    }
+};
+
+class Node
+{
+private:
+    int des;
+    Node *next;
+
+public:
+    Node()
+    {
+        des = 0;
+        next = NULL;
+    }
+    Node(int des)
+    {
+        this->des = des;
+        next = NULL;
+    }
+    friend class Graph;
+};
+
+class Graph
+{
+private:
+    int nv;
+    string *places;
+    Node **adjList;
+
+public:
+    Graph()
+    {
+        nv = 0;
+        places = NULL;
+        adjList = NULL;
+    }
+    Graph(int nv)
+    {
+        this->nv = nv;
+        places = new string[nv];
+        adjList = new Node *[nv];
+        for (int i = 0; i < nv; i++)
+        {
+            adjList[i] = NULL;
+        }
+    }
+
+    int getIndex(string name)
+    {
+        for (int i = 0; i < nv; i++)
+        {
+            if(places[i] == name)
+            {
+                return i;
+            }
+        }
+        return -1;  
+    }
+
+    void addEdge(int s,int d)
+    {
+        Node *new_node = new Node(d);
+        new_node->next = adjList[s];
+        adjList[s] = new_node;
+    }
+
+    void initGraph()
+    {
+        for (int i = 0; i < nv; i++)
+        {
+            cout << "Enter place [ " << i  << " ]: " << endl;
+            cin >> places[i];
+        }
+
+        string des;
+
+        for (int i = 0; i < nv; i++)
+        {
+            for (int j = 0; j < nv- 1; j++)
+            {
+                cout << "Enter places connected to " << places[i] << " ";
+                cin >> des;
+
+                int srcId = getIndex(places[i]);
+                int desId = getIndex(des);
+
+                if(srcId == -1 || desId == -1)
+                {
+                    break;
+                }
+
+                addEdge(srcId,desId);
+                
+            } 
+        } 
+    }
+
+    void displayGraph()
+    {
+        for (int i = 0; i < nv; i++)
+        {
+            Node *temp = adjList[i];
+            cout << places[i] << "->";
+            while(temp != NULL)
+            {
+                cout << places[temp->des] << " ";
+                temp = temp->next;
+            }
+            cout << endl;
+        }  
+    }
+
+    void bfs(int src)
+    {
+        bool visited[nv];
+        for (int i = 0; i < nv; i++)
+        {
+            visited[i] = false;
+        }
+
+        Queue<int>que;
+        que.enqueue(src);
+        visited[src] = true;
+
+        while(!que.isEmpty())
+        {
+            int curr = que.dequeue();
+            cout << places[curr] << " ";
+
+            Node *temp = adjList[curr];
+            while(temp != NULL)
+            {
+                int neighbour = temp->des;
+                if(visited[neighbour] == false)
+                {
+                    visited[neighbour] = true;
+                    que.enqueue(neighbour);
+                }
+                temp = temp->next;
+            }
+        }
+
+        cout << endl; 
+
+    }
+
+    void dfs(int src)
+    {
+        bool visited[nv];
+        for (int i = 0; i < nv; i++)
+        {
+            visited[i] = false;
+        }
+
+        Stack<int>s;
+        s.push(src);
+        visited[src] = true;
+
+        while(!s.isEmpty())
+        {
+            int curr = s.pop();
+            cout << places[curr] << " ";
+
+            Node *temp = adjList[curr];
+            while(temp != NULL)
+            {
+                int neighbour = temp->des;
+                if(visited[neighbour] == false)
+                {
+                    visited[neighbour] = true;
+                    s.push(neighbour);
+                }
+                temp = temp->next;
+            }
+        }
+
+        cout << endl; 
+    }
+
+    void dfsHelper(int src,bool visited[])
+    {
+        cout << places[src] << " ";
+        visited[src] = true;
+
+        Node *temp = adjList[src];
+        while(temp != NULL)
+        {
+            int neighbour = temp->des;
+            if(visited[neighbour] == false)
+            {
+                visited[neighbour] = true;
+                dfsHelper(neighbour,visited);
+            }
+            temp = temp->next;
+        }
+
+    }
+
+    void dfs2(int src)
+    {
+        bool visited[nv];
+        for (int i = 0; i < nv; i++)
+        {
+            visited[i] = false;
+        }
+        dfsHelper(src,visited);
+        cout << endl;
+    }
+
+    int getDegree(int srcId)
+    {
+        int degree = 0;
+        Node *temp = adjList[srcId];
+        while(temp != NULL)
+        {
+            degree++;
+            temp = temp->next;
+        }
+        return degree;
+    }
+};
+
+int main()
+{
+    int nv;
+    cout << "Enter the number of places : " << endl;
+    cin >> nv;
+    Graph *g = new Graph(nv);
+    int ch, ch1;
+    string src;
+    int srcId;
+
+    do
+    {
+        cout << "=========================================" << endl;
+        cout << "1-Initilaize Graph " << endl;
+        cout << "2-Display Graph " << endl;
+        cout << "3-BFS Traversal " << endl;
+        cout << "4-DFS Traversal " << endl;
+        cout << "5-Degree of a Node in Graph " << endl;
+        cout << "6-Exit " << endl;
+        cout << "=========================================" << endl;
+        cout << "Enter your choice: " << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            g->initGraph();
+            break;
+        case 2:
+            g->displayGraph();
+            break;
+        case 3:
+            cout << "BFS Traversal of Graph : " << endl;
+            cout << "Enter Source : " << endl;
+            cin >> src;
+            srcId = g->getIndex(src);
+            g->bfs(srcId);
+            break;
+        case 4:
+            cout << "DFS Traversal of Graph(Non Recursive) : " << endl;
+            cout << "Enter Source : " << endl;
+            cin >> src;
+            srcId = g->getIndex(src);
+            g->dfs(srcId);
+            cout << "DFS Traversal of Graph(Recursive): " << endl;
+            g->dfs2(srcId);
+            break;
+        case 5:
+            cout << "Enter the node of which you want degree " << endl;
+            cin >> src;
+            srcId = g->getIndex(src);
+            if(srcId == -1)
+            {
+                cout << src << " node not found " << endl;
+            }
+            else
+            {
+                cout << "The degree of " << src << " is " << g->getDegree(srcId) << endl;
+            }
+            break;
+        case 6:
+            cout << "Quiting..." << endl;
+            exit(0);
+            break;
+        default:
+            cout << "Enter a valid choice " << endl;
+            break;
+        }
+
+        cout << "Do you want to continue,Press 1 " << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+
+    return 0;
+}
+
+
+===========================Assignment 7=========================================
+You have a business with several offices; you want to lease phone lines to connect them
+up with each other; and the phone company charges different amounts of money to
+connect different pairs of cities. You want a set of lines that connects all your offices with
+a minimum total cost. Solve the problem by using weighted graph and applying minimum
+spanning tree algorithm.
+================================================================================
+Code: It will satisfy Practical No 7 and Q No (25) of Practical Question Bank.
+================================================================================
+#include <iostream>
+#define INF 1e9
+using namespace std;
+
+class Graph
+{
+private:
+    int nv;
+    int **adjMatrix;
+    string *cities;
+
+public:
+    Graph(int nv)
+    {
+        this->nv = nv;
+        adjMatrix = new int *[nv];
+        cities = new string[nv];
+
+        for (int i = 0; i < nv; i++)
+        {
+            adjMatrix[i] = new int[nv];
+            for (int j = 0; j < nv; j++)
+            {
+                adjMatrix[i][j] = 0;
+            }
+        }
+    }
+
+    int getIndex(string name)
+    {
+        for (int i = 0; i < nv; i++)
+        {
+            if (name == cities[i])
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    void addEdge(int srcId, int desId, int weight)
+    {
+        adjMatrix[srcId][desId] = weight;
+        adjMatrix[desId][srcId] = weight;
+    }
+
+    void initGraph()
+    {
+        string des;
+        int weight;
+        int srcId, desId;
+
+        // Access the nv cities
+        for (int i = 0; i < nv; i++)
+        {
+            cout << "Enter City[ " << i << " ]:" << endl;
+            cin >> cities[i];
+        }
+
+        for (int i = 0; i < nv; i++)
+        {
+            for (int j = 0; j < nv - 1; j++)
+            {
+                cout << "Enter cities connected to " << cities[i] << " : ";
+                cin >> des;
+
+                cout << "Enter the cost of coonection : ";
+                cin >> weight;
+
+                srcId = getIndex(cities[i]);
+                desId = getIndex(des);
+
+                if (srcId == -1 || desId == -1)
+                {
+                    break;
+                }
+                addEdge(srcId, desId, weight);
+            }
+        }
+    }
+
+    void displayGraph()
+    {
+        for (int i = 0; i < nv; i++)
+        {
+            cout << cities[i] << " : ";
+            for (int j = 0; j < nv; j++)
+            {
+                cout << "( " << cities[j] << " : " << adjMatrix[i][j] << " ) ";
+            }
+            cout << endl;
+        }
+    }
+
+    int minVal(int key[], bool mstSet[])
+    {
+        int min = INF, minIdx;
+        for (int i = 0; i < nv; i++)
+        {
+            if (mstSet[i] == false && key[i] < min)
+            {
+                min = key[i];
+                minIdx = i;
+            }
+        }
+        return minIdx;
+    }
+
+    void primsAlgo()
+    {
+        int parent[nv];
+        int key[nv];
+        bool mstSet[nv];
+
+        for (int i = 0; i < nv; i++)
+        {
+            mstSet[i] = false;
+            key[i] = INF;
+        }
+
+        parent[0] = -1;
+        key[0] = 0;
+
+        for (int count = 0; count < nv - 1; count++) // As we will be getting only 5 edges
+        {
+            int u = this->minVal(key, mstSet);
+            mstSet[u] = true;
+
+            for (int i = 0; i < nv; i++)
+            {
+                if (adjMatrix[u][i] != 0 && adjMatrix[u][i] < key[i] && mstSet[i] != true)
+                {
+                    parent[i] = u;
+                    key[i] = adjMatrix[u][i];
+                }
+            }
+        }
+
+        printMst(parent);
+    }
+
+    void printMst(int parent[])
+    {
+        cout << "Minimum cost for connection is " << endl;
+        cout << "Edges\tWeights: " << endl;
+        int cost = 0;
+        for (int i = 1; i < nv; i++)
+        {
+            cost += adjMatrix[i][parent[i]];
+            cout << cities[parent[i]] << "-" << cities[i] << "\t " << adjMatrix[i][parent[i]] << endl;
+        }
+        cout << "Minimum Cost of Spanning Tree is " << cost << endl;
+        
+    }
+};
+
+int main()
+{
+    int nv;
+    cout << "Enter the number of cities : ";
+    cin >> nv;
+    Graph obj(nv);
+
+    int ch, ch1;
+
+    do
+    {
+        cout << "===================================" << endl;
+        cout << "1-Initialize Graph " << endl;
+        cout << "2-Display Graph " << endl;
+        cout << "3-MST(Prim's Algorithm)" << endl;
+        cout << "4-Exit.." << endl;
+        cout << "===================================" << endl;
+        cout << "Enter your choice: " << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            obj.initGraph();
+            break;
+
+        case 2:
+            obj.displayGraph();
+            break;
+
+        case 3:
+            obj.primsAlgo();
+            break;
+        case 4:
+            cout << "Exiting.." << endl;
+            exit(0);
+            break;
+        default:
+            cout << "Enter a Valid choice " << endl;
+            break;
+        }
+
+        cout << "Do you want to continue,Press 1 " << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+
+    return 0;
+}
+
+================================================================================
+================================================================================
+----------------------------------Assigment No 8:------------------------------
+Given sequence k = k1 <k2 < … <kn of n sorted keys, with a successful and unsuccessful
+search probability pi and qi for each key ki. Build the Binary search tree that has the least
+search cost given the access probability for each key.
+================================================================================
+Code: It will satisfy Practical No 8 and Q No (24) of Practical Question Bank.
+================================================================================
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Node
+{
+private:
+    string str;
+    Node *ls;
+    Node *rs;
+
+public:
+    Node()
+    {
+        str = "";
+        ls = NULL;
+        rs = NULL;
+    }
+    Node(string s)
+    {
+        str = s;
+        ls = NULL;
+        rs = NULL;
+    }
+    friend class OBST;
+};
+
+class OBST
+{
+private:
+    Node *root;
+
+public:
+    OBST()
+    {
+        root = NULL;
+    }
+
+    void calculate_weight(vector<double> &p, vector<double> &q, vector<string> &st)
+    {
+        int n = p.size();
+
+        // Creating 2D Arrays dynamically
+        double **w = new double *[n + 1];
+        double **c = new double *[n + 1];
+        double **r = new double *[n + 1];
+
+        // Now allocating memeory for these data
+        for (int i = 0; i < n + 1; i++)
+        {
+            w[i] = new double[n + 1];
+            c[i] = new double[n + 1];
+            r[i] = new double[n + 1];
+        }
+
+        // Setting up initial 2 rows for further calculation in DP
+        for (int i = 0; i < n; i++)
+        {
+            w[i][i] = q[i];
+            c[i][i] = r[i][i] = 0;
+
+            w[i][i + 1] = p[i] + q[i + 1] + q[i];
+            c[i][i + 1] = w[i][i + 1];
+            r[i][i + 1] = i + 1;
+        }
+
+        w[n][n] = q[n];
+        c[n][n] = r[n][n] = 0;
+
+        // Using Dynmaic Programming now
+        for (int m = 2; m <= n; m++)
+        {
+            for (int i = 0; i <= n - m; i++)
+            {
+                double min = 999;
+                int j = i + m;
+                int k = 0;
+                w[i][j] = w[i][j - 1] + p[j - 1] + q[j];
+
+                for (int x = i + 1; x <= j; x++)
+                {
+                    double sum = c[i][x - 1] + c[x][j];
+                    if (sum < min)
+                    {
+                        min = sum;
+                        k = x;
+                    }
+                }
+
+                c[i][j] = w[i][j] + c[i][k - 1] + c[k][j];
+                r[i][j] = k;
+            }
+        }
+
+        // Creating OBST
+        this->root = this->createTree(0, n, r, st);
+        // Displaying contents
+        show(w, c, r, n + 1);
+    }
+
+    void show(double **w, double **c, double **r, int n)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = i; j < n; j++)
+            {
+                cout << w[i][j] << " " << c[i][j] << " " << r[i][j] << "| "
+                     << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    Node *createTree(int i, int j, double **r, vector<string> &st)
+    {
+        if (i != j)
+        {
+            int k = r[i][j];
+            Node *new_node = new Node(st[k - 1]);
+            new_node->ls = createTree(i, k - 1, r, st);
+            new_node->rs = createTree(k, j, r, st);
+            return new_node;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+
+    void preorder(Node *node)
+    {
+        if (node == NULL)
+            return;
+        cout << node->str << " ";
+        preorder(node->ls);
+        preorder(node->rs);
+    }
+
+    Node *getRoot()
+    {
+        return root;
+    }
+};
+
+using namespace std;
+int main()
+{
+    int n;
+    vector<string> st;
+    vector<double> p, q;
+    OBST obj;
+
+    cout << "Enter the number of strings " << endl;
+    cin >> n;
+
+    cout << "Enter those keys/strings " << endl;
+    for (int i = 0; i < n; i++)
+    {
+        string str;
+        cin >> str;
+        st.push_back(str);
+    }
+
+    cout << "Enter " << n << " successfull probabilities " << endl;
+    for (int i = 0; i < n; i++)
+    {
+        double num;
+        cin >> num;
+        p.push_back(num);
+    }
+
+    cout << "Enter " << n + 1 << " successfull probabilities " << endl;
+    for (int i = 0; i <= n; i++)
+    {
+        double num;
+        cin >> num;
+        q.push_back(num);
+    }
+
+    obj.calculate_weight(p, q, st);
+    cout << "The Preorder Traversal is " << endl;
+    obj.preorder(obj.getRoot());
+
+    return 0;
+}
+================================================================================
+
+================================================================================
+----------------------------------Assigment No 9:------------------------------
+A Dictionary stores keywords and its meanings. Provide facility for adding new keywords.
+Provide facility to display whole data sorted in ascending/ Descending order. Also find
+how many maximum comparisons may require for finding any keyword. Use Height
+balanced (AVL) tree.(Considering Integer data)
+================================================================================
+Code: It will satisfy Practical No 9 and Q No (23) of Practical Question Bank.
+================================================================================
+#include <iostream>
+#include <stack>
+using namespace std;
+
+class Node
+{
+private:
+    int data;
+    int height;
+    Node *left;
+    Node *right;
+
+public:
+    Node()
+    {
+        data = 0;
+        height = 1;
+        left = NULL;
+        right = NULL;
+    }
+    friend class AVLDict;
+};
+
+class AVLDict
+{
+private:
+    Node *root;
+
+public:
+    AVLDict()
+    {
+        root = NULL;
+    }
+
+    // To update the height of any node whenever needed..
+    int update_height(Node *node)
+    {
+        if (node == NULL)
+            return 0;
+        node->height =  1 + max((update_height(node->left)), (update_height(node->right)));
+        return node->height;
+    }
+
+    // To calculate balance factor whenever needed..
+    int balance_factor(Node *node)
+    {
+        if (node == NULL)
+            return 0;
+        return ((update_height(node->left)) - (update_height(node->right)));
+    }
+
+    // This piece of code will balance things out
+    Node *balance(Node *node)
+    {
+        if (balance_factor(node) == 2) // Positive Balance Factor means Left side subtree is unbalanced
+        {
+            if (balance_factor(node->left) < 0)
+            {
+                node = LRRotation(node);
+            }
+            else
+            {
+                node = LLRotation(node);
+            }
+        }
+        else if (balance_factor(node) == -2) // Problem in balancing right subtree
+        {
+            if (balance_factor(node->right) > 0) // see this properly
+            {
+                node = RLRotation(node);
+            }
+            else
+            {
+                node = RRRotation(node);
+            }
+        }
+        update_height(node);
+        return node;
+    }
+
+    // When we want to insert something
+    Node *insert(Node *&node, int key)
+    {
+        if (node == NULL)
+        {
+            node = new Node;
+            node->data = key;
+            return node;
+        }
+
+        if (key > node->data)
+        {
+            node->right = insert(node->right, key);
+        }
+        else if (key < node->data)
+        {
+            node->left = insert(node->left, key);
+        } 
+        // If key is equal to node's data, don't create a new node
+        return balance(node);
+    }
+
+    // 4 Rotations:
+    Node *LLRotation(Node *node)
+    {
+        Node *new1 = node->left;
+        node->left = new1->right;
+        new1->right = node;
+        update_height(node);
+        update_height(new1);
+        return new1;
+    }
+
+    Node *LRRotation(Node *node)
+    {
+        node->left = RRRotation(node->left);
+        return LLRotation(node);
+    }
+
+    Node *RRRotation(Node *node)
+    {
+        Node *new1 = node->right;
+        node->right = new1->left;
+        new1->left = node;
+        update_height(node);
+        update_height(new1);
+        return new1;
+    }
+
+    Node *RLRotation(Node *node)
+    {
+        node->right = LLRotation(node->right);
+        return RRRotation(node);
+    }
+
+    void inorder(Node *node)
+    {
+        if (node == NULL)
+            return;
+        inorder(node->left);
+        cout << node->data << " ";
+        inorder(node->right);
+    }
+
+    void printDescending(Node *node)
+    {
+        Node *curr = node;
+        stack<Node *> s1;
+
+        while (curr != NULL || !s1.empty())
+        {
+            while (curr != NULL)
+            {
+                s1.push(curr);
+                curr = curr->right;
+            }
+
+            curr = s1.top();
+            s1.pop();
+            cout << curr->data << " ";
+            curr = curr->left;
+        }
+        cout << endl;
+    }
+
+    void search(Node *node, int data, int &pos)
+    {
+        if (node == NULL)
+        {
+            pos = -1;
+            cout << data << " not found !! " << endl;
+        }
+        else if (data == node->data)
+        {
+            pos++;
+            cout << data << " found !! " << endl;
+        }
+        else if (data < node->data)
+        {
+            pos++;
+            search(node->left, data, pos);
+        }
+        else if (data > node->data)
+        {
+            pos++;
+            search(node->right, data, pos);
+        }
+    }
+
+    void searchELement(Node *node)
+    {
+        int data;
+        cout << "Enter the data you want to search " << endl;
+        cin >> data;
+        int noc = 0;
+        search(node, data, noc);
+        cout << "No of comparisons required to search element is " << noc << endl;
+    }
+};
+
+int main()
+{
+    int ch, ch1;
+    int data;
+    AVLDict obj;
+    Node *p = NULL;
+
+    do
+    {
+        cout << "---------------Enter your choice--------------------" << endl;
+        cout << "1-Insert Data" << endl;
+        cout << "2-Display Data in Ascedning Order" << endl;
+        cout << "3-Display Data in Descending Order" << endl;
+        cout << "4-Search Data " << endl;
+        cout << "5-Exit" << endl;
+        cout << "----------------------------------------------------" << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            cout << "Enter the data you want to insert !! " << endl;
+            cin >> data;
+            p = obj.insert(p, data);
+            cout << "Element inserted Successfully!! " << endl;
+            break;
+
+        case 2:
+            cout << "Displaying Data in Ascending Order " << endl;
+            obj.inorder(p);
+            cout << endl;
+            break;
+
+        case 3:
+            cout << "Displaying Data in Descending Order " << endl;
+            obj.printDescending(p);
+            cout << endl;
+            break;
+
+        case 4:
+            obj.searchELement(p);
+            cout << endl;
+            break;
+
+        case 5:
+            cout << "Exiting...." << endl;
+            exit(0);
+            break;
+        default:
+            cout << "Enter a valid choice..." << endl;
+            break;
+        }
+
+        cout << "Do you want to continue,Press 1 " << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+
+    return 0;
+}
+
+
+================================================================================
+================================================================================
+----------------------------------Assigment No 10:------------------------------
+Implement the Heap sort algorithm for demonstrating heap data structure with modularity
+of programming language (consider integer data)
+                                OR 
+Read the marks obtained by students of second year in an online examination of particular
+subject.Find out minimum marks obtained in that subject. Use heap data structure.
+Analyze the algorithm
+================================================================================
+Code: It will satisfy Practical No 10 and Q No (21 22) of Practical Question Bank.
+================================================================================
+Code1:
+================================================================================
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Heap
+{
+public:
+    void print(vector<int> &arr)
+    {
+        for (int i = 0; i < arr.size(); i++)
+        {
+            cout << arr[i] << " ";
+        }
+        cout << endl;
+    }
+
+    void heapify(vector<int> &arr, int n, int i)
+    {
+        int largest = i;
+        while (true)
+        {
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+
+            if (left < n && arr[left] > arr[largest])
+            {
+                largest = left;
+            }
+
+            if (right < n && arr[right] > arr[largest])
+            {
+                largest = right;
+            }
+
+            if(i == largest) break;
+            
+            swap(arr[i], arr[largest]);
+            i = largest;
+        }
+        
+    }
+
+    void heapsort(vector<int> &arr)
+    {
+        int n = arr.size();
+        for (int i = n / 2; i >= 0; i--)
+        {
+            heapify(arr, n, i);
+        }
+
+        for (int i = n - 1; i > 0; i--)
+        {
+            swap(arr[0], arr[i]);
+            heapify(arr, i, 0);
+        }
+    }
+};
+
+int main()
+{
+    int n;
+    Heap h;
+
+    cout << "Enter the size of array : " << endl;
+    cin >> n;
+
+    cout << "Enter the elements : " << endl;
+    vector<int> arr(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> arr[i];
+    }
+    cout << "Before sorting : " << endl;
+    h.print(arr);
+    h.heapsort(arr);
+    cout << "After sorting : " << endl;
+    h.print(arr);
+
+    return 0;
+}
+
+================================================================================
+Code2:
+================================================================================
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Heap
+{
+public:
+    void print(vector<int> &arr)
+    {
+        for (int i = 0; i < arr.size(); i++)
+        {
+            cout << arr[i] << " ";
+        }
+        cout << endl;
+    }
+
+    void heapify(vector<int> &arr, int n, int i)
+    {
+        int largest = i;
+        while (true)
+        {
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+
+            if (left < n && arr[left] > arr[largest])
+            {
+                largest = left;
+            }
+
+            if (right < n && arr[right] > arr[largest])
+            {
+                largest = right;
+            }
+
+            if(i == largest) break;
+            
+            swap(arr[i], arr[largest]);
+            i = largest;
+        }
+        
+    }
+
+    void heapsort(vector<int> &arr)
+    {
+        int n = arr.size();
+        for (int i = n / 2; i >= 0; i--)
+        {
+            heapify(arr, n, i);
+        }
+
+        for (int i = n - 1; i > 0; i--)
+        {
+            swap(arr[0], arr[i]);
+            heapify(arr, i, 0);
+        }
+    }
+
+    int getSmall(vector<int> &arr)
+    {
+        return arr[0];
+    }
+};
+
+int main()
+{
+    int n;
+    Heap h;
+
+    cout << "Enter the number of students : " << endl;
+    cin >> n;
+
+    cout << "Enter the marks obtained by those students : " << endl;
+    vector<int> arr(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> arr[i];
+    }
+
+    h.heapsort(arr);
+
+    cout << "The minimum marks obtained is " << h.getSmall(arr) << endl;
+
+    return 0;
+}
+
+For min heap : just change 2 comparison sign ( arr[left] and arr[right] < arr[largest])
+and change largest name to smallest for enhancibility.
+================================================================================
+================================================================================
+----------------------------------Assigment No 11:------------------------------
+Department maintains a student information. The file contains roll number, name, division
+and address. Allow user to add, delete information of student. Display information of
+particular employee. If record of student does not exist an appropriate message is
+displayed. If it is, then the system displays the student details. Use sequential file to
+maintain the data
+================================================================================
+It satisfies Practical No 11 and Q.20 of Practical Question Bank.
+================================================================================
+Code:
+================================================================================
+
+#include <iostream>
+#include <fstream>
+#include <cstring>
+using namespace std;
+
+class Student
+{
+private:
+    int rollNo;
+    char name[20];
+    char division[20];
+    char address[20];
+
+public:
+    void getStudentDetails()
+    {
+        cout << "\nEnter Roll Number : ";
+        cin >> rollNo;
+        cin.ignore();
+        cout << "\nEnter Name : ";
+        cin >> name;
+        cout << "\nEnter Division : ";
+        cin >> division;
+        cout << "\nEnter Address : ";
+        cin >> address;
+    }
+
+    void displayStudentDetails()
+    {
+        cout << "===================================" << endl;
+        cout << "Roll Number is " << rollNo << endl;
+        cout << "Name is " << name << endl;
+        cout << "Division is " << division << endl;
+        cout << "Address is " << address << endl;
+        cout << "===================================" << endl;
+    }
+    friend class StudentDB;
+};
+
+class StudentDB
+{
+private:
+    Student s;
+
+public:
+    int saveStudentData()
+    {
+        s.getStudentDetails();
+        if (s.rollNo != 0 && strcmp(s.name, "")) // everything alright
+        {
+            ofstream obj;
+            obj.open("datafile.dat", ios::app | ios::binary); // Here you almost made mistake (use |)
+            obj.write((char *)&s, sizeof(s));
+            obj.close();
+            return 1;
+        }
+        else
+        {
+            cout << "Please enter data to save!" << endl;
+            return 0;
+        }
+    }
+
+    void displayStudentData()
+    {
+        ifstream obj;
+        Student s;
+        obj.open("datafile.dat", ios::in | ios::binary);
+
+        if (!obj)
+        {
+            cout << "File Not Found! " << endl;
+        }
+        else
+        {
+            obj.read((char *)&s, sizeof(s));
+            while (!obj.eof())
+            {
+                s.displayStudentDetails();
+                obj.read((char *)&s, sizeof(s));
+            }
+        }
+        obj.close();
+    }
+
+    void searchStudentData(const char *name)
+    {
+        ifstream obj;
+        Student s;
+        obj.open("datafile.dat", ios::in | ios::binary);
+
+        if (!obj)
+        {
+            cout << "File Not Found! " << endl;
+        }
+        else
+        {
+            obj.read((char *)&s, sizeof(s));
+            while (!obj.eof())
+            {
+                if (strcmp(s.name, name) == 0)
+                {
+                    cout << "Student Found !! " << endl;
+                    s.displayStudentDetails();
+                    return;
+                }
+                obj.read((char *)&s, sizeof(s));
+            }
+            cout << "Student Not Found !! " << endl;
+        }
+        obj.close();
+    }
+
+    void deleteStudentData(const char *name)
+    {
+        ifstream obj1;
+        ofstream obj2;
+
+        obj1.open("datafile.dat", ios::in | ios::binary);
+        obj2.open("tempfile.dat", ios::out | ios::binary);
+
+        if (!obj1)
+        {
+            cout << "File Not Found!" << endl;
+            return;
+        }
+        else
+        {
+            obj1.read((char *)&s, sizeof(s));
+            while (!obj1.eof())
+            {
+                if (strcmp(s.name, name) != 0)
+                {
+                    obj2.write((char *)&s, sizeof(s));
+                }
+                obj1.read((char *)&s, sizeof(s));
+            }
+            obj1.close();
+            obj2.close();
+            remove("datafile.dat");
+            rename("tempfile.dat", "datafile.dat");
+            return;
+        }
+    }
+};
+
+int main()
+{
+    int ch, ch1;
+    StudentDB obj;
+    string data;
+    do
+    {
+        cout << "===============================" << endl;
+        cout << "1-Add Student Data" << endl;
+        cout << "2-Display all students" << endl;
+        cout << "3-Search Student Data" << endl;
+        cout << "4-Delete Student Data" << endl;
+        cout << "5-Exit" << endl;
+        cout << "===============================" << endl;
+        cout << "Enter your choice" << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            obj.saveStudentData();
+            break;
+
+        case 2:
+            obj.displayStudentData();
+            break;
+
+        case 3:
+            cout << "Enter the name : "
+                 << " ";
+            cin >> data;
+            cout << endl;
+            obj.searchStudentData(data.c_str());
+            break;
+
+        case 4:
+            cout << "Enter the name : "
+                 << " ";
+            cin >> data;
+            cout << endl;
+            obj.deleteStudentData(data.c_str());
+            break;
+        case 5:
+            cout << "Exiting..." << endl;
+            exit(0);
+            break;
+        default:
+            cout << "Enter a Valid Choice " << endl;
+            break;
+        }
+
+        cout << "Do you want to continue,Press 1 " << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+
+    return 0;
+}
+
+================================================================================
+================================================================================
+----------------------------------Assigment No 12:------------------------------
+Implementation of a direct access file -Insertion and deletion of a record from a direct
+access file.
+================================================================================
+It satisfies Practical No 12 and Q.26 of Practical Question Bank.
+================================================================================
+Code:
+#include <iostream>
+#include <fstream>
+#include <cstring>
+using namespace std;
+
+#define SIZE 10
+
+class Student
+{
+private:
+    int rollNo;
+    char name[10];
+
+public:
+    Student()
+    {
+        rollNo = 0;
+        strcpy(name, "");
+    }
+    void getStudentDetails()
+    {
+        cout << "Enter Roll No : ";
+        cin >> rollNo;
+        cout << "\nEnter Name : ";
+        cin >> name;
+    }
+
+    void displayStudentDetails()
+    {
+        cout << "==================================" << endl;
+        cout << "Roll No is " << rollNo;
+        cout << "\nName is " << name;
+        cout << "\n==================================" << endl;
+    }
+
+    friend class DAF;
+};
+
+class DAF
+{
+private:
+    Student s;
+
+public:
+    void init()
+    {
+        ifstream obj("datafile1.dat", ios::binary);
+        if (!obj)
+        {
+            cout << "File does not exist.Creating a file with dummy data " << endl;
+            obj.close();
+
+            ofstream obj1("datafile.dat", ios::binary);
+            for (int i = 0; i < SIZE; i++)
+            {
+                Student dummy;
+                obj1.write((char *)&dummy, sizeof(Student));
+            }
+            obj1.close();
+        }
+        else
+        {
+            obj.close();
+        }
+    }
+
+    int getHash(int data)
+    {
+        return (data % SIZE);
+    }
+
+    void save()
+    {
+        s.getStudentDetails();
+        int hash = getHash(s.rollNo);
+        fstream obj("datafile.dat", ios::binary | ios::in | ios::out);
+        obj.seekp(hash * sizeof(Student), ios::beg);
+        obj.write((char *)&s, sizeof(Student));
+        obj.close();
+    }
+
+    void read()
+    {
+        int data;
+        cout << "Enter Roll Number : " << endl;
+        cin >> data;
+
+        int hash = getHash(data);
+        ifstream obj("datafile.dat", ios::binary);
+        obj.seekg(hash * sizeof(Student), ios::beg);
+        obj.read((char *)&s, sizeof(Student));
+
+        if (s.rollNo == data)
+        {
+            s.displayStudentDetails();
+        }
+        else
+        {
+            cout << "Student Data Not Found !! " << endl;
+        }
+        obj.close();
+    }
+
+    void delStudent()
+    {
+        int data;
+        cout << "Enter Roll Number : ";
+        cin >> data;
+        cout << endl;
+        int hash = getHash(data);
+        fstream obj("datafile.dat", ios::binary | ios::in | ios::out);
+        obj.seekp(hash * sizeof(Student), ios::beg);
+        Student dummy;
+        obj.write((char *)&dummy, sizeof(Student));
+        if (obj)
+        {
+            cout << "Student Deleted Successfully " << endl;
+        }
+        else
+        {
+            cout << "Student Not Found !! " << endl;
+        }
+        obj.close();
+    }
+};
+
+int main()
+{
+    int ch, ch1;
+    DAF obj;
+    obj.init();
+
+    do
+    {
+
+        cout << "=========================================== " << endl;
+        cout << "1-Insert Student Data" << endl;
+        cout << "2-Display Student Data" << endl;
+        cout << "3-Delete Student Data" << endl;
+        cout << "4-Exit" << endl;
+        cout << "=========================================== " << endl;
+        cout << "Enter your choice" << endl;
+        cin >> ch;
+
+        switch (ch)
+        {
+        case 1:
+            obj.save();
+            break;
+
+        case 2:
+            obj.read();
+            break;
+
+        case 3:
+            obj.delStudent();
+            break;
+
+        case 4:
+            exit(0);
+            break;
+
+        default:
+            cout << "Enter a valid choice " << endl;
+            break;
+        }
+        cout << "Do you want to continue,Press 1 " << endl;
+        cin >> ch1;
+    } while (ch1 == 1);
+
+    return 0;
+}
+================================================================================
